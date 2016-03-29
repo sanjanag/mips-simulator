@@ -16,15 +16,11 @@ Exe::MainLoop (void)
   while (1)
     {
       AWAIT_P_PHI0;	// @posedge
-      //  if (_mc->_decodeValid) {
-      //        ins = _mc->_ins; //PIPELINED
+      //sampling inputs
       ins = _mc->ID_EX_ins;
-      //        isSyscall = _mc->_isSyscall; //PIPELINED
       isSyscall = _mc->ID_EX_isSyscall;
-      //         isIllegalOp = _mc->_isIllegalOp;
       isIllegalOp = _mc->ID_EX_isIllegalOp;
 
-      //AWAIT_P_PHI1;	// @negedge
       if (!isSyscall && !isIllegalOp)
         {
           _mc->ID_EX_opControl(_mc,ins);

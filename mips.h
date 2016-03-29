@@ -32,6 +32,11 @@ public:
    Mipc (Mem *m);
    ~Mipc ();
 
+   //Memory address register
+   unsigned _MAR_EX; //to store the destination for load store in EX
+   unsigned _MAR_MEM; //to update the destination with load/store value
+   //Needed because update happens before use
+   
    //Pipeline registers  IF/ID
    unsigned int IF_ID_ins;
    int IF_ID_bd; //NOT SURE
@@ -61,7 +66,7 @@ public:
    unsigned int EX_MEM_ins; 
    unsigned	EX_MEM_opResultHi, EX_MEM_opResultLo;
    int 		EX_MEM_btaken;
-   unsigned	EX_MEM_MAR;
+   //   unsigned	EX_MEM_MAR;
    Bool		EX_MEM_writeREG, EX_MEM_writeFREG;
    Bool 	EX_MEM_hiWPort, EX_MEM_loWPort;
    Bool EX_MEM_isSyscall;

@@ -15,8 +15,11 @@ Memory::MainLoop (void)
   while (1) {
     AWAIT_P_PHI0;	// @posedge
     //      if (_mc->_execValid) {
+
     memControl = _mc->EX_MEM_memControl;
+    
     AWAIT_P_PHI1;       // @negedge
+
     if (memControl)
       {
         _mc->EX_MEM_memOp (_mc);
