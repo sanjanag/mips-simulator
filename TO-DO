@@ -1,0 +1,12 @@
+set the registers in reboot state in mips.cc
+_hi _lo ??
+mfhi mflo
+_pc used in jalr bgezal bltzal jal
+_MAR used in swr sw sh sb swcl lwcl lwr lw lwl lhu lh lbu lb
+put pipeline register updates from decode function to .cc file
+Use nextPC pipeline register for computation of branch targets
+system calls in wb stage
+_bd not used yet
+_pc used in fake_syscall (see if change is required or not)
+_pc also used in dumpregs
+_pc used in wb.cc if syscall
