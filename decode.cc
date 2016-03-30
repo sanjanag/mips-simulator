@@ -12,59 +12,53 @@ Decode::MainLoop (void)
 {
   unsigned int ins;
   unsigned int pc;
-  int lastbd;
-  int currbd;
-  unsigned EX_MEM_decodedDST, MEM_WB_decodedDST;
-  int null;
-  Bool isSyscall;
+  int bd;
+
   while (1)
     {
       AWAIT_P_PHI0;	// @posedge
-
-      ins = _mc->IF_ID_ins;
-      pc = _mc->IF_ID_pc;
-      lastbd = _mc->ID_EX_bd;
-      currbd = _mc->ID_EX_bd;
-      EX_MEM_decodedDST = _mc->EX_MEM_decodedDST;
-      MEM_WB_decodedDST = _mc->MEM_WB_decodedDST;
-      null = _mc->ID_EX_null;
-      npc = _mc->IF_ID_npc;
-      
-      AWAIT_P_PHI1;	// @negedge
-
-      if(null == 1)
+      if(!_mc->_RAW)
         {
-          ins = 0;
-          _mc->Dec(0);
+          ins = _mc->IF_ID_ins;
+          pc = _mc->IF_ID_pc;
+          bd = _mc->ID_EX_bd;
         }
       else
         {
-
-          _mc->Dec(ins);
-
-          //check for RAW hazards
-          if((_mc->ID_EX_decodedSRC1 == EX_MEM_decodedDST || _mc->ID_EX_decodedSRC2 == EX_MEM_decodedDST ||) || ( _mc->ID_EX_decodedSRC1 == MEM_WB_decodedDST || _mc->ID_EX_decodedSRC2 == MEM_WB_decodedDST))
-            _mc->ID_EX_raw = 1;
-
-      
-          if(currbd || _mc->ID_EX_raw || _mc->isSyscall)
-            _mc->ID_EX_null = 1;
-
-          _mc->ID_EX_npc = npc;
-          if(_mc->ID_EX_raw)
-            {
-              ins = 0;
-              _mc->Dec(ins);
-              _mc->ID_EX_npc = pc;
-            }
+          ins = _mc->_DEC_ins;
+          pc = _mc->_DEC_pc;
+          bd = _mc->_DEC_bd;
         }
-      ID_EX_ins = ins;
+      
+      AWAIT_P_PHI1;	// @negedge
+
+      _mc->Dec(pc, ins, bd);
+      
+      
+      //check for RAW hazards
+      if((_mc->ID_EX_decodedSRC1 == EX_MEM_decodedDST || _mc->ID_EX_decodedSRC2 == EX_MEM_decodedDST ||) || ( _mc->ID_EX_decodedSRC1 == MEM_WB_decodedDST || _mc->ID_EX_decodedSRC2 == MEM_WB_decodedDST))
+        {
+          _mc->_DEC_ins = ins;
+          _mc->_DEC_pc = pc;
+          _mc->_DEC_bd = bd;
+          ins = 0;
+          _mc->Dec(pc, ins, bd);
+          _mc->_stallFETCH = 1;
+          _mc->_RAW = 1;
+        }
+      else
+        {
+          _mc->_stallFETCH = 0;
+          _mc->_RAW = 0;
+        }
+      
+      
       ID_EX_pc = pc; // for jalr
+      ID_EX_ins = ins;
      
 #ifdef MIPC_DEBUG
       fprintf(_mc->_debugLog, "<%llu> Decoded ins %#x\n", SIM_TIME, ins);
 #endif
-    
     
     }
 }

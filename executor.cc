@@ -10,20 +10,52 @@ Exe::~Exe (void) {}
 void
 Exe::MainLoop (void)
 {
-  unsigned int ins;
   Bool isSyscall, isIllegalOp;
-
+  unsigned int ins;
+  void (*opControl)(Mipc*, unsigned);
+  unsigned int btgt;
+  unsigned int pc, bd;
+  signed int decodedSRC1, decodedSRC2;
+  unsigned decodedDST;
+  Bool writeREG, writeFREG;
+  Bool hiWPort, loWPort;
+  Bool memControl;
+  unsigned decodedShiftAmt;
+  signed int branchOffset;
+  unsigned subregOperand;
+  void(*memOp)(Mipc*);
+  unsigned int hi, lo;
+  
   while (1)
     {
       AWAIT_P_PHI0;	// @posedge
+
       //sampling inputs
       ins = _mc->ID_EX_ins;
       isSyscall = _mc->ID_EX_isSyscall;
       isIllegalOp = _mc->ID_EX_isIllegalOp;
-
+      opControl = _mc->ID_EX_opControl;
+      btgt = _mc->ID_EX_btgt;
+      pc = _mc->ID_EX_pc;
+      bd = _mc=>ID_EX_bd;
+      decodedSRC1 = _mc->ID_EX_decodedSRC1;
+      decodedSRC2 = _mc->ID_EX_decodedSRC2;
+      decodedDST = _mc->ID_EX_decodedDST;
+      writeREG = _mc->ID_EX_writeREG;
+      writeFREG = _mc->ID_EX_writeFREG;
+      hiWPort = _mc->ID_EX_hiWPort;
+      loWPort = _mc->ID_EX_loWPort;
+      memControl = _mc->ID_EX_memControl;
+      decodedShiftAmt = _mc->ID_EX_decodedShiftAmt;
+      branchOffset = _mc->ID_EX_branchOffset;
+      subregOperand = _mc->ID_EX_subregOperand;
+      memOp = _mc->ID_EX_memOp;
+      hi = _mc->ID_EX_hi;
+      lo = _mc->ID_EX_lo;
+      
       if (!isSyscall && !isIllegalOp)
         {
-          _mc->ID_EX_opControl(_mc,ins);
+          opControl(_mc,ins);
 #ifdef MIPC_DEBUG
           fprintf(_mc->_debugLog, "<%llu> Executed ins %#x\n", SIM_TIME, ins);
 #endif
@@ -40,35 +72,44 @@ Exe::MainLoop (void)
           fprintf(_mc->_debugLog, "<%llu> Illegal ins %#x in execution stage at PC %#x\n", SIM_TIME, ins, _mc->_pc);
 #endif
         }
-      //         _mc->_decodeValid = FALSE;
-      // _mc->_execValid = TRUE;
 
       if (!isIllegalOp && !isSyscall)
         {
-          if (/*_mc->_lastbd &&*/ _mc->EX_MEM_btaken)
+          if ( _mc->contents->btaken)
             {
-              _mc->_pc = _mc->ID_EX_btgt;
+              _mc->_npc = btgt;
+              _mc->_BTAKEN = 1;
             }
-          /*        else
-                    {
-                    _mc->_pc = _mc->_pc + 4;
-                    }*/
-          //            _mc->_lastbd = _mc->_bd;
         }
-      //transfer pipeline register contents
-      EX_MEM_ins = ID_EX_ins;
-      EX_MEM_hiWPort = ID_EX_hiWPort;
-      EX_MEM_loWPort = ID_EX_loWPort;
-      EX_MEM_memOp = ID_EX_memOp;
-      EX_MEM_memControl = ID_EX_memControl;
-      EX_MEM_writeREG = ID_EX_writeREG;
-      EX_MEM_writeFREG = ID_EX_writeFREG;
-      EX_MEM_decodedDST = ID_EX_decodedDST;
-      EX_MEM_isSyscall = ID_EX_isSyscall;
-      EX_MEM_isIllegalOp = ID_EX_isIllegalOp;
-      EX_MEM_opControl = ID_EX_opControl;
+        
+      
       
       AWAIT_P_PHI1;	// @negedge
+      //transfer pipeline register contents
+      EX_MEM_pc = pc;
+      EX_MEM_ins = ins;
+      EX_MEM_bd = bd;
+      EX_MEM_decodedSRC1 = decodedSRC1;
+      EX_MEM_decodedSRC2 = decodedSRC2;
+      EX_MEM_decodedShiftAmt = decodedShiftAmt;
+      EX_MEM_btgt = btgt;
+      EX_MEM_branchOffset = branchOffset;
+      EX_MEM_subregOperand  = subregOperand;
+      EX_MEM_hiWPort = hiWPort;
+      EX_MEM_loWPort = loWPort;
+      EX_MEM_memOp = memOp;
+      EX_MEM_memControl = memControl;
+      EX_MEM_writeREG = writeREG;
+      EX_MEM_writeFREG = writeFREG;
+      EX_MEM_decodedDST = decodedDST;
+      EX_MEM_isSyscall = isSyscall;
+      EX_MEM_isIllegalOp = isIllegalOp;
+      EX_MEM_opControl = opControl;
+      EX_MEM_hi = hi;
+      EX_MEM_lo = lo;
+      EX_MEM_opResultHi = _mc->contents->opResultHi;
+      EX_MEM_opResultLo = _mc->contents->opResultLo;
+      EX_MEM_btaken = _mc->contents->btaken;
       //FETCH
       
     }

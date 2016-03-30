@@ -43,15 +43,19 @@ Mipc::MainLoop (void)
 
       pc = _npc;
       addr = pc;
+      stallFETCH = _stallFETCH;
       
       AWAIT_P_PHI1;	// @negedge
 
-      if(!_stallFETCH)
+      if(!stallFETCH)
         {
           ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7)); //ins fetched
 
           //update pipeline registers
-          _npc = _npc + 4;
+          if(!_BTAKEN)
+            _npc = _npc + 4;
+          else
+            _BTAKEN = 0;
           IF_ID_pc = pc;
           IF_ID_ins = ins;
           IF_ID_bd = 0;
@@ -61,9 +65,6 @@ Mipc::MainLoop (void)
 #endif
           _nfetched++;
         }
-
-      
-
         }
           MipcDumpstats();
           Log::CloseLog();
@@ -74,7 +75,7 @@ Mipc::MainLoop (void)
 #endif
 
           exit(0);
-}
+        }
           
           void
             Mipc::MipcDumpstats()

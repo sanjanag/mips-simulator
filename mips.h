@@ -32,9 +32,21 @@ public:
    Mipc (Mem *m);
    ~Mipc ();
 
-   Bool _null; //1 if the next instruction is nullified
+   int _stallFETCH;
+   unsigned int _DEC_ins;
+   unsigned int _DEC_pc;
+   unsigned int _DEC_bd;
+
+   struct EX_MEM_contents
+   {
+     unsigned opResultLo, opResultHi;
+     int btaken;
+   } EX_MEM_contents;
+   
+   EX_MEM_contents *contents;
+   //Bool _null; //1 if the next instruction is nullified
    unsigned int _npc;
-   Bool _bd; //1 if the next instruction is branch delay
+   //Bool _bd; //1 if the next instruction is branch delay
    //Memory address register
    unsigned _MAR_EX; //to store the destination for load store in EX
    unsigned _MAR_MEM; //to update the destination with load/store value
@@ -43,7 +55,7 @@ public:
    //Pipeline registers  IF/ID
    unsigned int IF_ID_pc;
    unsigned int IF_ID_ins;
-   int IF_ID_bd;
+   unsigned int IF_ID_bd;
    
    //Pipeline registers ID/EX
    unsigned int ID_EX_pc;
@@ -59,10 +71,10 @@ public:
    void (*ID_EX_opControl)(Mipc*, unsigned);
    unsigned	ID_EX_decodedShiftAmt;
    unsigned int	ID_EX_btgt; 
-   signed int	ID_EX_branchOffset; //transfer as it is if needed
+   signed int	ID_EX_branchOffset;
    unsigned 	ID_EX_subregOperand;
    void (*ID_EX_memOp)(Mipc*);
-   unsigned int ID_EX_hi, ID_EX_lo;
+   unsigned int ID_EX_hi, ID_EX_lo; //not updated yet
    
    //Pipeline registers EX/MEM
    unsigned int EX_MEM_pc;
