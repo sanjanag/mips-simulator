@@ -33,6 +33,10 @@ public:
    ~Mipc ();
 
    int _stallFETCH;
+   int _stallDECODE;
+   int _SYSCALL;
+   int _RAW;
+   
    unsigned int _DEC_ins;
    unsigned int _DEC_pc;
    unsigned int _DEC_bd;
@@ -46,10 +50,7 @@ public:
    unsigned tempsubregOperand;
    unsigned tempdecodedDST;
    EX_MEM_contents *contents;
-   //Bool _null; //1 if the next instruction is nullified
    unsigned int _npc;
-   //Bool _bd; //1 if the next instruction is branch delay
-   //Memory address register
    unsigned _MAR_EX; //to store the destination for load store in EX
    unsigned _MAR_MEM; //to update the destination with load/store value
    //Needed because update happens before use
@@ -136,24 +137,6 @@ public:
    void Dec (unsigned int ins);			// Decoder function
    void fake_syscall (unsigned int ins);	// System call interface
 
-   /* processor state */
-   //   unsigned int _ins;   // instruction register PIPELINED
-   //   Bool         _insValid;      // Needed for unpipelined design
-   //   Bool         _decodeValid;   // Needed for unpipelined design
-   //   Bool		_execValid;	// Needed for unpipelined design
-   //   Bool		_memValid;	// Needed for unpipelined design
-   //   Bool         _insDone;       // Needed for unpipelined design
-   //   int _noNOP; //if the next instruction to be fetched is a NOP
-   //   signed int	_decodedSRC1, _decodedSRC2;	// Reg fetch output (source values)
-   //   unsigned	_decodedDST;			// Decoder output (dest reg no)
-   //   unsigned 	_subregOperand;			// Needed for lwl and lwr
-   //   unsigned	_MAR;				// Memory address register
-   //   unsigned	_opResultHi//, _opResultLo;	// Result of operation
-   //   Bool 	_memControl;			// Memory instruction?
-   //   Bool		_writeREG, _writeFREG;		// WB control
-   //   signed int	_branchOffset;
-   //   Bool 	_hiWPort, _loWPort;		// WB control
-   //   unsigned	_decodedShiftAmt;		// Shift amount
 
    unsigned int 	_gpr[32];		// general-purpose integer registers
 
@@ -163,17 +146,8 @@ public:
       double d;
    } _fpr[16];					// floating-point registers (paired)
 
-   //   unsigned int _hi, _lo; 			// mult, div destination
-   //   unsigned int	_pc;				// Program counter
-   //   unsigned int _lastbd;			// branch delay state
    unsigned int _boot;				// boot code loaded?
 
-   //   int 		_btaken; 			// taken branch (1 if taken, 0 if fall-through)
-   //   int 		_bd;				// 1 if the next ins is delay slot PIPELINED
-   //   unsigned int	_btgt;				// branch target
-
-   //   Bool		_isSyscall;			// 1 if system call PIPELINED
-   //   Bool		_isIllegalOp;			// 1 if illegal opcode PIPELINED
 
    // Simulation statistics counters
 

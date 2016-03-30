@@ -158,8 +158,92 @@ Mipc::MainLoop (void)
           _btgt = 0xdeadbeef;
           _sim_exit = 0;
           _pc = ParamGetInt ("Mipc.BootPC");	// Boom! GO
-        }
-        }
+          /*----------------------------------*/
+          _npc = ParamGetInt ("Mipc.BootPC");	// Boom! GO
+          _stallFETCH = 0;
+          _stallDECODE = 0;
+          _SYSCALL = 0;
+          _RAW = 0;
+   
+          _DEC_ins = 0;
+          _DEC_pc = 0xdeadbeef;;
+          _DEC_bd = 0;
+          
+          tempsubregOperand = 0;
+          tempdecodedDST = 0;
+          contents = NULL;
+          _MAR_EX = 0; //to store the destination for load store in EX
+          _MAR_MEM = 0; //to update the destination with load/store value
+   //Needed because update happens before use
+   
+   //Pipeline registers  IF/ID
+          IF_ID_pc = 0xdeadbeef;;
+          IF_ID_ins = 0;
+          IF_ID_bd = 0;
+   
+   //Pipeline registers ID/EX
+          ID_EX_pc = 0xdeadbeef;;
+          ID_EX_ins = 0;
+          ID_EX_bd = 0;
+          ID_EX_isSyscall = FALSE;
+          ID_EX_isIllegalOp = FALSE;
+          ID_EX_decodedSRC1 = 0; ID_EX_decodedSRC2 = 0;;
+          ID_EX_decodedDST = 0;;
+          ID_EX_writeREG = TRUE; ID_EX_writeFREG = FALSE;
+          ID_EX_hiWPort = FALSE; ID_EX_loWPort = FALSE;
+          ID_EX_memControl = FALSE; 
+          ID_EX_opControl = NULL;
+          ID_EX_decodedShiftAmt = 0;
+          ID_EX_btgt = 0xdeadbeef;; 
+          ID_EX_branchOffset = 0;
+          ID_EX_subregOperand = 0;
+          ID_EX_memOp = NULL;
+          ID_EX_hi = 0; ID_EX_lo = 0;
+   
+   //Pipeline registers EX/MEM
+          EX_MEM_pc = 0xdeadbeef;;
+          EX_MEM_ins = 0;
+          EX_MEM_bd = 0;
+          EX_MEM_isSyscall = FALSE;
+          EX_MEM_isIllegalOp = FALSE;
+          EX_MEM_decodedSRC1 = 0; EX_MEM_decodedSRC2 = 0;
+          EX_MEM_decodedDST = 0;
+          EX_MEM_writeREG = TRUE; EX_MEM_writeFREG = FALSE;
+          EX_MEM_memControl = FALSE; 
+          EX_MEM_opControl = NULL;
+          EX_MEM_decodedShiftAmt = 0;
+          EX_MEM_btgt = 0xdeadbeef;;
+          EX_MEM_branchOffset = 0;
+          EX_MEM_subregOperand = 0;
+          EX_MEM_memOp = NULL;
+          EX_MEM_hiWPort = FALSE; EX_MEM_loWPort = FALSE;
+          EX_MEM_opResultHi = 0; EX_MEM_opResultLo = 0;
+          EX_MEM_btaken = 0;
+          EX_MEM_hi = 0; EX_MEM_lo = 0;
+   
+          //Pipeline registers MEM/WB
+          MEM_WB_pc = 0xdeadbeef;;
+          MEM_WB_ins = 0;
+          MEM_WB_bd = 0;
+          MEM_WB_isSyscall = FALSE;
+          MEM_WB_isIllegalOp = FALSE;
+          MEM_WB_decodedSRC1 = 0; MEM_WB_decodedSRC2 = 0;
+          MEM_WB_decodedDST = 0;
+          MEM_WB_writeREG, MEM_WB_writeFREG = FALSE;
+          MEM_WB_memControl = FALSE; 
+          MEM_WB_opControl = NULL;
+          MEM_WB_decodedShiftAmt = 0;
+          MEM_WB_btgt = 0xdeadbeef;
+          MEM_WB_branchOffset = 0;
+          MEM_WB_subregOperand = 0;
+          MEM_WB_memOp = NULL;
+          MEM_WB_hiWPort = FALSE; MEM_WB_loWPort = FALSE;
+          MEM_WB_opResultHi = 0; MEM_WB_opResultLo = 0;
+          MEM_WB_btaken = 0;
+          MEM_WB_hi = 0; MEM_WB_lo = 0;
+
+          }
+          }
 
           LL
             MipcSysCall::GetDWord(LL addr)
