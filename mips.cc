@@ -2,10 +2,6 @@
 #include <assert.h>
 #include "mips-irix5.h"
 
-//Pipeline Registers
-//unsigned int IF_ID;
-
-
 
 Mipc::Mipc (Mem *m) : _l('M')
 {
@@ -47,7 +43,7 @@ Mipc::MainLoop (void)
       
       AWAIT_P_PHI1;	// @negedge
 
-      if(!stallFETCH)
+      if(stallFETCH == 0)
         {
           ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7)); //ins fetched
 
@@ -64,6 +60,10 @@ Mipc::MainLoop (void)
           fprintf(_debugLog, "<%llu> Fetched ins %#x from PC %#x\n", SIM_TIME, ins, pc);
 #endif
           _nfetched++;
+        }
+        else
+          {
+          _stallFETCH = _stallFETCH -1;
         }
         }
           MipcDumpstats();
