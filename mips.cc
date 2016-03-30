@@ -39,19 +39,51 @@ Mipc::MainLoop (void)
     {
       AWAIT_P_PHI0;	// @posedge
       //EXECUTE
-    
+      unsigned  int _pc = IF_ID_npc;
+      int raw = ID_EX_raw;
+      bd == EX_MEM_bd;
+      if(bd == 1)
+        btgt = EX_MEM_btgt;
+      if(raw == 1 && bd == 0)
+        {
+          _pc =  ID_EX_npc; 
+        }
+      if(raw == 0 && bd == 1)
+        {
+          _pc = EX_MEM_npc;
+        }
+      if(raw == 1 && bd == 1)
+        {
+          _pc = ID_EX_npc;
+        }
+      if(ID_EX_isSyscall)
+        {
+          syscall = 1;
+          _pc = ID_EX_npc;
+        }
+      if(EX_MEM_isSyscall)
+        {
+          syscall =1;
+          _pc = EX_MEM_npc;
+        }
       AWAIT_P_PHI1;	// @negedge
+      
       addr = _pc;
-      ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7));
+      ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7)); //instruction fetched
+      
+      //      _npc = _npc + 4; //if this is not a NOP increment NPC else pass ins = 0
       IF_ID_ins = ins;
       IF_ID_bd = 0;
       IF_ID_pc = _pc; //to calculate _btgt
-
-      
+      IF_ID_npc = _pc + 4;
+      if(raw==1 && bd==1)
+        IF_ID_npc = btgt;
+      if(syscall == 1)
+        IF_ID_ins = 0;
 #ifdef MIPC_DEBUG
       fprintf(_debugLog, "<%llu> Fetched ins %#x from PC %#x\n", SIM_TIME, ins, _pc);
 #endif
-      _pc = _pc + 4; //NPC
+      //_pc = _pc + 4; //NPC
       _nfetched++;
     }
 

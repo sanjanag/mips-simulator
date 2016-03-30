@@ -32,7 +32,7 @@ Mipc::Dec (unsigned int ins)
   void (*_opControl)(Mipc*, unsigned);
   unsigned	_decodedShiftAmt;
   unsigned int	_btgt;
-  int _bd;
+  int _bd = IF_ID_bd;
   signed int _branchOffset;
   unsigned _subregOperand;
   void (*_memOp)(Mipc*);  

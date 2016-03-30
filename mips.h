@@ -32,6 +32,9 @@ public:
    Mipc (Mem *m);
    ~Mipc ();
 
+   Bool _null; //1 if the next instruction is nullified
+   unsigned int _npc;
+   Bool _bd; //1 if the next instruction is branch delay
    //Memory address register
    unsigned _MAR_EX; //to store the destination for load store in EX
    unsigned _MAR_MEM; //to update the destination with load/store value
@@ -39,11 +42,10 @@ public:
    
    //Pipeline registers  IF/ID
    unsigned int IF_ID_ins;
-   int IF_ID_bd; //NOT SURE
+   int IF_ID_bd;
    unsigned int IF_ID_pc;
-   //   unsigned IF_ID_npc; //Next PC
-
-
+   unsigned int IF_ID_npc;
+   
    //Pipeline registers ID/EX
    unsigned int ID_EX_ins;
    Bool ID_EX_isSyscall;
@@ -61,6 +63,7 @@ public:
    unsigned 	ID_EX_subregOperand;
    void (*ID_EX_memOp)(Mipc*);
    unsigned int ID_EX_pc; //for ins like jalr
+   unsigned int ID_EX_pc;
    
    //Pipeline registers EX/MEM
    unsigned int EX_MEM_ins; 
@@ -75,6 +78,7 @@ public:
    Bool EX_MEM_memControl; 
    void (*EX_MEM_memOp)(Mipc*);
    void (*EX_MEM_opControl)(Mipc*, unsigned);
+   unsigned int EX_MEM_pc;
    
    //Pipeline registers MEM/WB
    unsigned int MEM_WB_ins;
@@ -85,6 +89,7 @@ public:
    unsigned	MEM_WB_decodedDST;
    unsigned	MEM_WB_opResultHi, MEM_WB_opResultLo;
    void (*MEM_WB_opControl)(Mipc*, unsigned);
+   unsigned int MEM_WB_pc;
    
    FAKE_SIM_TEMPLATE;
 
@@ -102,13 +107,13 @@ public:
    void fake_syscall (unsigned int ins);	// System call interface
 
    /* processor state */
-   unsigned int _ins;   // instruction register PIPELINED
-   Bool         _insValid;      // Needed for unpipelined design
-   Bool         _decodeValid;   // Needed for unpipelined design
-   Bool		_execValid;	// Needed for unpipelined design
-   Bool		_memValid;	// Needed for unpipelined design
-   Bool         _insDone;       // Needed for unpipelined design
-
+   //   unsigned int _ins;   // instruction register PIPELINED
+   //   Bool         _insValid;      // Needed for unpipelined design
+   //   Bool         _decodeValid;   // Needed for unpipelined design
+   //   Bool		_execValid;	// Needed for unpipelined design
+   //   Bool		_memValid;	// Needed for unpipelined design
+   //   Bool         _insDone;       // Needed for unpipelined design
+   //   int _noNOP; //if the next instruction to be fetched is a NOP
    //   signed int	_decodedSRC1, _decodedSRC2;	// Reg fetch output (source values)
    //   unsigned	_decodedDST;			// Decoder output (dest reg no)
    //   unsigned 	_subregOperand;			// Needed for lwl and lwr

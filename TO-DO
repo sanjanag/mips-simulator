@@ -13,5 +13,4 @@ _pc used in wb.cc if syscall
 
 *Intelock logics required*
 need two _MAR one for EX and one for MEM
-
-replace EX_MEM  with mc->EX_MEM in exec_helper.cc
+how to implement stalls

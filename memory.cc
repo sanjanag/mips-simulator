@@ -24,25 +24,25 @@ Memory::MainLoop (void)
       {
         _mc->EX_MEM_memOp (_mc);
 #ifdef MIPC_DEBUG
-        fprintf(_mc->_debugLog, "<%llu> Accessing memory at address %#x for ins %#x\n", SIM_TIME, _mc->_MAR, _mc->_ins);
+        fprintf(_mc->_debugLog, "<%llu> Accessing memory at address %#x for ins %#x\n", SIM_TIME, _mc->_MAR_MEM, _mc->_ins);
 #endif
       }
     else {
 #ifdef MIPC_DEBUG
-      fprintf(_mc->_debugLog, "<%llu> Memory has nothing to do for ins %#x\n", SIM_TIME, _mc->_ins);
+      fprintf(_mc->_debugLog, "<%llu> Memory has nothing to do for ins %#x\n", SIM_TIME, _mc->EX_MEM_ins);
 #endif
     }
-    MEM_WB_ins = EX_MEM_ins;
-    MEM_WB_writeREG = EX_MEM_writeREG;
-    MEM_WB_writeFREG = EX_MEM_writeFREG;
-    MEM_WB_hiWPort = EX_MEM_hiWPort;
-    MEM_WB_loWPort = EX_MEM_loWPort;
-    MEM_WB_decodedDST = EX_MEM_decodedDST;
-    MEM_WB_opResultHi = EX_MEM_opResultHi;
-    MEM_WB_opResultLo = EX_MEM_opResultLo;
-    MEM_WB_isSyscall = EX_MEM_isSyscall;
-    MEM_WB_isIllegalOp = EX_MEM_isIllegalOp;
-    MEM_WB_opControl = EX_MEM_opControl;
+    _mc->MEM_WB_ins = mc->EX_MEM_ins;
+    _mc->MEM_WB_writeREG = mc->EX_MEM_writeREG;
+    _mc->MEM_WB_writeFREG = mc->EX_MEM_writeFREG;
+    _mc->MEM_WB_hiWPort = mc->EX_MEM_hiWPort;
+    _mc->MEM_WB_loWPort = mc->EX_MEM_loWPort;
+    _mc->MEM_WB_decodedDST = mc->EX_MEM_decodedDST;
+    _mc->MEM_WB_opResultHi = mc->EX_MEM_opResultHi;
+    _mc->MEM_WB_opResultLo = mc->EX_MEM_opResultLo;
+    _mc->MEM_WB_isSyscall = mc->EX_MEM_isSyscall;
+    _mc->MEM_WB_isIllegalOp = mc->EX_MEM_isIllegalOp;
+    _mc->MEM_WB_opControl = mc->EX_MEM_opControl;
     
     //         _mc->_execValid = FALSE;
     // _mc->_memValid = TRUE;
