@@ -42,7 +42,9 @@ public:
      unsigned opResultLo, opResultHi;
      int btaken;
    } EX_MEM_contents;
-   
+
+   unsigned tempsubregOperand;
+   unsigned tempdecodedDST;
    EX_MEM_contents *contents;
    //Bool _null; //1 if the next instruction is nullified
    unsigned int _npc;
