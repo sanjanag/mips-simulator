@@ -41,13 +41,14 @@ public:
    //Needed because update happens before use
    
    //Pipeline registers  IF/ID
+   unsigned int IF_ID_pc;
    unsigned int IF_ID_ins;
    int IF_ID_bd;
-   unsigned int IF_ID_pc;
-   unsigned int IF_ID_npc;
    
    //Pipeline registers ID/EX
+   unsigned int ID_EX_pc;
    unsigned int ID_EX_ins;
+   unsigned int ID_EX_bd;
    Bool ID_EX_isSyscall;
    Bool ID_EX_isIllegalOp;
    signed int	ID_EX_decodedSRC1, ID_EX_decodedSRC2;
@@ -58,38 +59,53 @@ public:
    void (*ID_EX_opControl)(Mipc*, unsigned);
    unsigned	ID_EX_decodedShiftAmt;
    unsigned int	ID_EX_btgt; 
-   int ID_EX_bd; //transfer as it is if needed
    signed int	ID_EX_branchOffset; //transfer as it is if needed
    unsigned 	ID_EX_subregOperand;
    void (*ID_EX_memOp)(Mipc*);
-   unsigned int ID_EX_pc; //for ins like jalr
-   unsigned int ID_EX_pc;
+   unsigned int ID_EX_hi, ID_EX_lo;
    
    //Pipeline registers EX/MEM
-   unsigned int EX_MEM_ins; 
-   unsigned	EX_MEM_opResultHi, EX_MEM_opResultLo;
-   int 		EX_MEM_btaken;
-   //   unsigned	EX_MEM_MAR;
-   Bool		EX_MEM_writeREG, EX_MEM_writeFREG;
-   Bool 	EX_MEM_hiWPort, EX_MEM_loWPort;
+   unsigned int EX_MEM_pc;
+   unsigned int EX_MEM_ins;
+   unsigned int EX_MEM_bd;
    Bool EX_MEM_isSyscall;
    Bool EX_MEM_isIllegalOp;
+   signed int EX_MEM_decodedSRC1, EX_MEM_decodedSRC2;
    unsigned	EX_MEM_decodedDST;
+   Bool		EX_MEM_writeREG, EX_MEM_writeFREG;
    Bool EX_MEM_memControl; 
-   void (*EX_MEM_memOp)(Mipc*);
    void (*EX_MEM_opControl)(Mipc*, unsigned);
-   unsigned int EX_MEM_pc;
+   unsigned EX_MEM_decodedShiftAmt;
+   unsigned int EX_MEM_btgt;
+   signed int EX_MEM_branchOffset;
+   unsigned 	EX_MEM_subregOperand;
+   void (*EX_MEM_memOp)(Mipc*);
+   Bool 	EX_MEM_hiWPort, EX_MEM_loWPort;
+   unsigned	EX_MEM_opResultHi, EX_MEM_opResultLo;
+   int 		EX_MEM_btaken;
+   unsigned int EX_MEM_hi, EX_MEM_lo;
    
    //Pipeline registers MEM/WB
+   unsigned int MEM_WB_pc;
    unsigned int MEM_WB_ins;
-   Bool		MEM_WB_writeREG, MEM_WB_writeFREG;
-   Bool 	MEM_WB_hiWPort, MEM_WB_loWPort;
+   unsigned int MEM_WB_bd;
    Bool MEM_WB_isSyscall;
    Bool MEM_WB_isIllegalOp;
+   signed int MEM_WB_decodedSRC1, MEM_WB_decodedSRC2;
    unsigned	MEM_WB_decodedDST;
-   unsigned	MEM_WB_opResultHi, MEM_WB_opResultLo;
+   Bool		MEM_WB_writeREG, MEM_WB_writeFREG;
+   Bool MEM_WB_memControl; 
    void (*MEM_WB_opControl)(Mipc*, unsigned);
-   unsigned int MEM_WB_pc;
+   unsigned MEM_WB_decodedShiftAmt;
+   unsigned int MEM_WB_btgt;
+   signed int MEM_WB_branchOffset;
+   unsigned 	MEM_WB_subregOperand;
+   void (*MEM_WB_memOp)(Mipc*);
+   Bool 	MEM_WB_hiWPort, MEM_WB_loWPort;
+   unsigned	MEM_WB_opResultHi, MEM_WB_opResultLo;
+   int 		MEM_WB_btaken;
+   unsigned int MEM_WB_hi, MEM_WB_lo;
+   
    
    FAKE_SIM_TEMPLATE;
 
@@ -133,8 +149,8 @@ public:
       double d;
    } _fpr[16];					// floating-point registers (paired)
 
-   unsigned int _hi, _lo; 			// mult, div destination
-   unsigned int	_pc;				// Program counter
+   //   unsigned int _hi, _lo; 			// mult, div destination
+   //   unsigned int	_pc;				// Program counter
    //   unsigned int _lastbd;			// branch delay state
    unsigned int _boot;				// boot code loaded?
 

@@ -30,203 +30,181 @@ Mipc::MainLoop (void)
 {
   LL addr;
   unsigned int ins;	// Local instruction register
-
+  unsigned int pc;
+  
   Assert (_boot, "Mipc::MainLoop() called without boot?");
 
   _nfetched = 0;
 
   while (!_sim_exit)
     {
+      
       AWAIT_P_PHI0;	// @posedge
-      //EXECUTE
-      unsigned  int _pc = IF_ID_npc;
-      int raw = ID_EX_raw;
-      bd == EX_MEM_bd;
-      if(bd == 1)
-        btgt = EX_MEM_btgt;
-      if(raw == 1 && bd == 0)
-        {
-          _pc =  ID_EX_npc; 
-        }
-      if(raw == 0 && bd == 1)
-        {
-          _pc = EX_MEM_npc;
-        }
-      if(raw == 1 && bd == 1)
-        {
-          _pc = ID_EX_npc;
-        }
-      if(ID_EX_isSyscall)
-        {
-          syscall = 1;
-          _pc = ID_EX_npc;
-        }
-      if(EX_MEM_isSyscall)
-        {
-          syscall =1;
-          _pc = EX_MEM_npc;
-        }
-      AWAIT_P_PHI1;	// @negedge
-      
-      addr = _pc;
-      ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7)); //instruction fetched
-      
-      //      _npc = _npc + 4; //if this is not a NOP increment NPC else pass ins = 0
-      IF_ID_ins = ins;
-      IF_ID_bd = 0;
-      IF_ID_pc = _pc; //to calculate _btgt
-      IF_ID_npc = _pc + 4;
-      if(raw==1 && bd==1)
-        IF_ID_npc = btgt;
-      if(syscall == 1)
-        IF_ID_ins = 0;
-#ifdef MIPC_DEBUG
-      fprintf(_debugLog, "<%llu> Fetched ins %#x from PC %#x\n", SIM_TIME, ins, _pc);
-#endif
-      //_pc = _pc + 4; //NPC
-      _nfetched++;
-    }
 
-  MipcDumpstats();
-  Log::CloseLog();
+      pc = _npc;
+      addr = pc;
+      
+      AWAIT_P_PHI1;	// @negedge
+
+      if(!_stallFETCH)
+        {
+          ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7)); //ins fetched
+
+          //update pipeline registers
+          _npc = _npc + 4;
+          IF_ID_pc = pc;
+          IF_ID_ins = ins;
+          IF_ID_bd = 0;
+      
+#ifdef MIPC_DEBUG
+          fprintf(_debugLog, "<%llu> Fetched ins %#x from PC %#x\n", SIM_TIME, ins, pc);
+#endif
+          _nfetched++;
+        }
+
+      
+
+        }
+          MipcDumpstats();
+          Log::CloseLog();
    
 #ifdef MIPC_DEBUG
-  assert(_debugLog != NULL);
-  fclose(_debugLog);
+          assert(_debugLog != NULL);
+          fclose(_debugLog);
 #endif
 
-  exit(0);
+          exit(0);
 }
+          
+          void
+            Mipc::MipcDumpstats()
+          {
+          Log l('*');
+          l.startLogging = 0;
 
-void
-Mipc::MipcDumpstats()
-{
-  Log l('*');
-  l.startLogging = 0;
+          l.print ("");
+          l.print ("************************************************************");
+          l.print ("");
+          l.print ("Number of instructions: %llu", _nfetched);
+          l.print ("Number of simulated cycles: %llu", SIM_TIME);
+          l.print ("CPI: %.2f", ((double)SIM_TIME)/_nfetched);
+          l.print ("Int Conditional Branches: %llu", _num_cond_br);
+          l.print ("Jump and Link: %llu", _num_jal);
+          l.print ("Jump Register: %llu", _num_jr);
+          l.print ("Number of fp instructions: %llu", _fpinst);
+          l.print ("Number of loads: %llu", _num_load);
+          l.print ("Number of syscall emulated loads: %llu", _sys->_num_load);
+          l.print ("Number of stores: %llu", _num_store);
+          l.print ("Number of syscall emulated stores: %llu", _sys->_num_store);
+          l.print ("");
 
-  l.print ("");
-  l.print ("************************************************************");
-  l.print ("");
-  l.print ("Number of instructions: %llu", _nfetched);
-  l.print ("Number of simulated cycles: %llu", SIM_TIME);
-  l.print ("CPI: %.2f", ((double)SIM_TIME)/_nfetched);
-  l.print ("Int Conditional Branches: %llu", _num_cond_br);
-  l.print ("Jump and Link: %llu", _num_jal);
-  l.print ("Jump Register: %llu", _num_jr);
-  l.print ("Number of fp instructions: %llu", _fpinst);
-  l.print ("Number of loads: %llu", _num_load);
-  l.print ("Number of syscall emulated loads: %llu", _sys->_num_load);
-  l.print ("Number of stores: %llu", _num_store);
-  l.print ("Number of syscall emulated stores: %llu", _sys->_num_store);
-  l.print ("");
+        }
 
-}
+          void 
+            Mipc::fake_syscall (unsigned int ins)
+          {
+          _sys->pc = _pc;
+          _sys->quit = 0;
+          _sys->EmulateSysCall ();
+          if (_sys->quit)
+            _sim_exit = 1;
+        }
 
-void 
-Mipc::fake_syscall (unsigned int ins)
-{
-  _sys->pc = _pc;
-  _sys->quit = 0;
-  _sys->EmulateSysCall ();
-  if (_sys->quit)
-    _sim_exit = 1;
-}
+          /*------------------------------------------------------------------------
+           *
+           *  Mipc::Reboot --
+           *
+           *   Reset processor state
+           *
+           *------------------------------------------------------------------------
+           */
+          void 
+            Mipc::Reboot (char *image)
+          {
+          FILE *fp;
+          Log l('*');
 
-/*------------------------------------------------------------------------
- *
- *  Mipc::Reboot --
- *
- *   Reset processor state
- *
- *------------------------------------------------------------------------
- */
-void 
-Mipc::Reboot (char *image)
-{
-  FILE *fp;
-  Log l('*');
+          _boot = 0;
 
-  _boot = 0;
+          if (image) {
+          _boot = 1;
+          printf ("Executing %s\n", image);
+          fp = fopen (image, "r");
+          if (!fp) {
+          fatal_error ("Could not open `%s' for booting host!", image);
+        }
+          _mem->ReadImage(fp);
+          fclose (fp);
 
-  if (image) {
-    _boot = 1;
-    printf ("Executing %s\n", image);
-    fp = fopen (image, "r");
-    if (!fp) {
-      fatal_error ("Could not open `%s' for booting host!", image);
-    }
-    _mem->ReadImage(fp);
-    fclose (fp);
+          // Reset state
+          _ins = 0;
+          _insValid = FALSE;
+          _decodeValid = FALSE;
+          _execValid = FALSE;
+          _memValid = FALSE;
+          _insDone = TRUE;
 
-    // Reset state
-    _ins = 0;
-    _insValid = FALSE;
-    _decodeValid = FALSE;
-    _execValid = FALSE;
-    _memValid = FALSE;
-    _insDone = TRUE;
+          _num_load = 0;
+          _num_store = 0;
+          _fpinst = 0;
+          _num_cond_br = 0;
+          _num_jal = 0;
+          _num_jr = 0;
 
-    _num_load = 0;
-    _num_store = 0;
-    _fpinst = 0;
-    _num_cond_br = 0;
-    _num_jal = 0;
-    _num_jr = 0;
+          _lastbd = 0;
+          _bd = 0;
+          _btaken = 0;
+          _btgt = 0xdeadbeef;
+          _sim_exit = 0;
+          _pc = ParamGetInt ("Mipc.BootPC");	// Boom! GO
+        }
+        }
 
-    _lastbd = 0;
-    _bd = 0;
-    _btaken = 0;
-    _btgt = 0xdeadbeef;
-    _sim_exit = 0;
-    _pc = ParamGetInt ("Mipc.BootPC");	// Boom! GO
-  }
-}
+          LL
+            MipcSysCall::GetDWord(LL addr)
+          {
+          _num_load++;      
+          return m->Read (addr);
+        }
 
-LL
-MipcSysCall::GetDWord(LL addr)
-{
-  _num_load++;      
-  return m->Read (addr);
-}
-
-void
-MipcSysCall::SetDWord(LL addr, LL data)
-{
+          void
+            MipcSysCall::SetDWord(LL addr, LL data)
+          {
   
-  m->Write (addr, data);
-  _num_store++;
-}
+          m->Write (addr, data);
+          _num_store++;
+        }
 
-Word 
-MipcSysCall::GetWord (LL addr) 
-{ 
+          Word 
+            MipcSysCall::GetWord (LL addr) 
+          { 
   
-  _num_load++;   
-  return m->BEGetWord (addr, m->Read (addr & ~(LL)0x7)); 
-}
+          _num_load++;   
+          return m->BEGetWord (addr, m->Read (addr & ~(LL)0x7)); 
+        }
 
-void 
-MipcSysCall::SetWord (LL addr, Word data) 
-{ 
+          void 
+            MipcSysCall::SetWord (LL addr, Word data) 
+          { 
   
-  m->Write (addr & ~(LL)0x7, m->BESetWord (addr, m->Read(addr & ~(LL)0x7), data)); 
-  _num_store++;
-}
+          m->Write (addr & ~(LL)0x7, m->BESetWord (addr, m->Read(addr & ~(LL)0x7), data)); 
+          _num_store++;
+        }
   
-void 
-MipcSysCall::SetReg (int reg, LL val) 
-{ 
-  _ms->_gpr[reg] = val; 
-}
+          void 
+            MipcSysCall::SetReg (int reg, LL val) 
+          { 
+          _ms->_gpr[reg] = val; 
+        }
 
-LL 
-MipcSysCall::GetReg (int reg) 
-{
-  return _ms->_gpr[reg]; 
-}
+          LL 
+            MipcSysCall::GetReg (int reg) 
+          {
+          return _ms->_gpr[reg]; 
+        }
 
-LL
-MipcSysCall::GetTime (void)
-{
-  return SIM_TIME;
-}
+          LL
+            MipcSysCall::GetTime (void)
+          {
+          return SIM_TIME;
+        }
