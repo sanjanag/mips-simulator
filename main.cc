@@ -6,7 +6,7 @@
 #include "tasking.h"
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdio.h>
 void cleanup (void)
 {
   Log::CloseLog ();
@@ -16,6 +16,7 @@ void cleanup (void)
 
 int main (int argc, char **argv)
 {
+  //  printf("Entered main.cc\n");
   Mipc *mh;
   Decode *dec;
   Exe *exec;
@@ -38,7 +39,7 @@ int main (int argc, char **argv)
   RegisterDefault ("MemSystem.Type", "None");
   RegisterDefault ("Log.StartDumpTime", 0);
   RegisterDefault ("Mipc.PeriodicTimer", 100000);
-
+  //  printf("RegisterDefault done\n");
   /* fixup arguments */
   if (argc > 1) {
      if (argv[1][0]=='-' && argv[1][1]=='l') {
@@ -92,7 +93,7 @@ int main (int argc, char **argv)
   }
 
   m = new Mem();
-
+  //printf("creating simtasks\n");
   mh = new Mipc(m);
   dec = new Decode(mh);
   exec = new Exe(mh);
@@ -103,7 +104,7 @@ int main (int argc, char **argv)
   SimCreateTask (exec, "EXE");
   SimCreateTask (mem, "MEM");
   SimCreateTask (wb, "WB");
-
+  
   /* there are arguments! */
   if (argc > 0) 
 	mh->_sys->ArgumentSetup (argc, argv, ParamGetInt ("Mipc.ArgvAddr"));

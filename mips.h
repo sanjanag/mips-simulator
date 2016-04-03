@@ -36,20 +36,21 @@ public:
    int _stallDECODE;
    int _SYSCALL;
    int _RAW;
-   
+   int _BTAKEN;
    unsigned int _DEC_ins;
    unsigned int _DEC_pc;
    unsigned int _DEC_bd;
 
-   struct EX_MEM_contents
+   struct temp_contents
    {
      unsigned opResultLo, opResultHi;
      int btaken;
-   } EX_MEM_contents;
+   } EX_MEM_contents ;
 
    unsigned tempsubregOperand;
    unsigned tempdecodedDST;
-   EX_MEM_contents *contents;
+	temp_contents* contents ;
+
    unsigned int _npc;
    unsigned _MAR_EX; //to store the destination for load store in EX
    unsigned _MAR_MEM; //to update the destination with load/store value
@@ -59,6 +60,8 @@ public:
    unsigned int IF_ID_pc;
    unsigned int IF_ID_ins;
    unsigned int IF_ID_bd;
+   int IF_ID_NOP;
+   int IF_ID_BRANCH;
    
    //Pipeline registers ID/EX
    unsigned int ID_EX_pc;
@@ -78,6 +81,8 @@ public:
    unsigned 	ID_EX_subregOperand;
    void (*ID_EX_memOp)(Mipc*);
    unsigned int ID_EX_hi, ID_EX_lo; //not updated yet
+   int ID_EX_NOP;
+   int ID_EX_BRANCH;
    
    //Pipeline registers EX/MEM
    unsigned int EX_MEM_pc;
@@ -99,6 +104,8 @@ public:
    unsigned	EX_MEM_opResultHi, EX_MEM_opResultLo;
    int 		EX_MEM_btaken;
    unsigned int EX_MEM_hi, EX_MEM_lo;
+   int EX_MEM_NOP;
+   int EX_MEM_BRANCH;
    
    //Pipeline registers MEM/WB
    unsigned int MEM_WB_pc;
@@ -120,13 +127,14 @@ public:
    unsigned	MEM_WB_opResultHi, MEM_WB_opResultLo;
    int 		MEM_WB_btaken;
    unsigned int MEM_WB_hi, MEM_WB_lo;
-   
+   int MEM_WB_NOP;
+   int MEM_WB_BRANCH;
    
    FAKE_SIM_TEMPLATE;
 
    MipcSysCall *_sys;		// Emulated system call layer
 
-   void dumpregs (void);	// Dumps current register state
+   void dumpregs (unsigned int _pc);	// Dumps current register state
 
    void Reboot (char *image = NULL);
 				// Restart processor.
@@ -134,8 +142,8 @@ public:
 				// image if any.
 
    void MipcDumpstats();			// Prints simulation statistics
-   void Dec (unsigned int ins);			// Decoder function
-   void fake_syscall (unsigned int ins);	// System call interface
+   void Dec (unsigned int pc, unsigned int ins, unsigned int bd);			// Decoder function
+   void fake_syscall (unsigned int ins, unsigned int pc);	// System call interface
 
 
    unsigned int 	_gpr[32];		// general-purpose integer registers

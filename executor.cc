@@ -10,6 +10,7 @@ Exe::~Exe (void) {}
 void
 Exe::MainLoop (void)
 {
+  //  printf("execution stage\n");
   Bool isSyscall, isIllegalOp;
   unsigned int ins;
   void (*opControl)(Mipc*, unsigned);
@@ -25,19 +26,19 @@ Exe::MainLoop (void)
   unsigned subregOperand;
   void(*memOp)(Mipc*);
   unsigned int hi, lo;
-  
+  int NOP,BRANCH;
+
   while (1)
     {
       AWAIT_P_PHI0;	// @posedge
 
-      //sampling inputs
       ins = _mc->ID_EX_ins;
       isSyscall = _mc->ID_EX_isSyscall;
       isIllegalOp = _mc->ID_EX_isIllegalOp;
       opControl = _mc->ID_EX_opControl;
       btgt = _mc->ID_EX_btgt;
       pc = _mc->ID_EX_pc;
-      bd = _mc=>ID_EX_bd;
+      bd = _mc->ID_EX_bd;
       decodedSRC1 = _mc->ID_EX_decodedSRC1;
       decodedSRC2 = _mc->ID_EX_decodedSRC2;
       decodedDST = _mc->ID_EX_decodedDST;
@@ -52,12 +53,15 @@ Exe::MainLoop (void)
       memOp = _mc->ID_EX_memOp;
       hi = _mc->ID_EX_hi;
       lo = _mc->ID_EX_lo;
-      
+      NOP = _mc->ID_EX_NOP;
+      BRANCH = _mc->ID_EX_BRANCH;
+
       if (!isSyscall && !isIllegalOp)
         {
           opControl(_mc,ins);
+      
 #ifdef MIPC_DEBUG
-          fprintf(_mc->_debugLog, "<%llu> Executed ins %#x\n", SIM_TIME, ins);
+          fprintf(_mc->_debugLog, "<%llu> Executed ins %#x opresultlo %#x\n", SIM_TIME, ins,_mc->EX_MEM_contents.opResultLo);
 #endif
         }
       else if (isSyscall)
@@ -69,15 +73,16 @@ Exe::MainLoop (void)
       else
         {
 #ifdef MIPC_DEBUG
-          fprintf(_mc->_debugLog, "<%llu> Illegal ins %#x in execution stage at PC %#x\n", SIM_TIME, ins, _mc->_pc);
+          fprintf(_mc->_debugLog, "<%llu> Illegal ins %#x in execution stage at PC %#x\n", SIM_TIME, ins, pc);
 #endif
         }
 
       if (!isIllegalOp && !isSyscall)
         {
-          if ( _mc->contents->btaken)
+          if ( _mc->EX_MEM_contents.btaken)
             {
               _mc->_npc = btgt;
+
               _mc->_BTAKEN = 1;
             }
         }
@@ -85,31 +90,36 @@ Exe::MainLoop (void)
       
       
       AWAIT_P_PHI1;	// @negedge
-      //transfer pipeline register contents
-      EX_MEM_pc = pc;
-      EX_MEM_ins = ins;
-      EX_MEM_bd = bd;
-      EX_MEM_decodedSRC1 = decodedSRC1;
-      EX_MEM_decodedSRC2 = decodedSRC2;
-      EX_MEM_decodedShiftAmt = decodedShiftAmt;
-      EX_MEM_btgt = btgt;
-      EX_MEM_branchOffset = branchOffset;
-      EX_MEM_subregOperand  = subregOperand;
-      EX_MEM_hiWPort = hiWPort;
-      EX_MEM_loWPort = loWPort;
-      EX_MEM_memOp = memOp;
-      EX_MEM_memControl = memControl;
-      EX_MEM_writeREG = writeREG;
-      EX_MEM_writeFREG = writeFREG;
-      EX_MEM_decodedDST = decodedDST;
-      EX_MEM_isSyscall = isSyscall;
-      EX_MEM_isIllegalOp = isIllegalOp;
-      EX_MEM_opControl = opControl;
-      EX_MEM_hi = hi;
-      EX_MEM_lo = lo;
-      EX_MEM_opResultHi = _mc->contents->opResultHi;
-      EX_MEM_opResultLo = _mc->contents->opResultLo;
-      EX_MEM_btaken = _mc->contents->btaken;
+      
+      _mc->EX_MEM_pc = pc;
+      _mc->EX_MEM_ins = ins;
+      _mc->EX_MEM_bd = bd;
+      _mc->EX_MEM_decodedSRC1 = decodedSRC1;
+      _mc->EX_MEM_decodedSRC2 = decodedSRC2;
+      _mc->EX_MEM_decodedShiftAmt = decodedShiftAmt;
+      _mc->EX_MEM_btgt = btgt;
+      _mc->EX_MEM_branchOffset = branchOffset;
+      _mc->EX_MEM_subregOperand  = subregOperand;
+      _mc->EX_MEM_hiWPort = hiWPort;
+      _mc->EX_MEM_loWPort = loWPort;
+      _mc->EX_MEM_memOp = memOp;
+      _mc->EX_MEM_memControl = memControl;
+      _mc->EX_MEM_writeREG = writeREG;
+      _mc->EX_MEM_writeFREG = writeFREG;
+      _mc->EX_MEM_decodedDST = decodedDST;
+      _mc->EX_MEM_isSyscall = isSyscall;
+      _mc->EX_MEM_isIllegalOp = isIllegalOp;
+      _mc->EX_MEM_opControl = opControl;
+      _mc->EX_MEM_hi = hi;
+      _mc->EX_MEM_lo = lo;
+      _mc->EX_MEM_opResultHi = _mc->EX_MEM_contents.opResultHi;
+      _mc->EX_MEM_opResultLo = _mc->EX_MEM_contents.opResultLo;
+      _mc->EX_MEM_btaken = _mc->EX_MEM_contents.btaken;
+      _mc->EX_MEM_contents.opResultLo = 0;
+      _mc->EX_MEM_contents.opResultHi = 0;
+      _mc->EX_MEM_contents.btaken = 0;
+      _mc->EX_MEM_NOP = NOP;
+      _mc->EX_MEM_BRANCH = BRANCH;
       //FETCH
       
     }
