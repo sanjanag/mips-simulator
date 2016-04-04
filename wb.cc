@@ -47,7 +47,7 @@ Writeback::MainLoop (void)
 #ifdef MIPC_DEBUG
           fprintf(_mc->_debugLog, "<%llu> SYSCALL! Trapping to emulation layer at PC %#x\n", SIM_TIME, pc);
 #endif
-          //          _mc->dumpregs(pc);
+          _mc->dumpregs(pc);
           _mc->MEM_WB_opControl(_mc, ins);
         }
       else if (isIllegalOp)

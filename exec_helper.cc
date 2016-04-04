@@ -46,7 +46,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
 #define SIGN_EXTEND_BYTE(x)  do { x <<= 24; x >>= 24; } while (0)
 #define SIGN_EXTEND_IMM(x)   do { x <<= 16; x >>= 16; } while (0)
 
-  //  cout<< "i.reg.op " << i.reg.op <<" pc "<< pc << " i.imm.rs " << i.imm.rs << " i.imm.imm " <<i.imm.imm << " i.reg.rs "<<i.reg.rs<<" i.reg.rt "<<i.reg.rt<<" i.reg.rd "<<i.reg.rd<< " i.imm.rt " << i.imm.rt<<endl;
+  //  //cout<< "i.reg.op " << i.reg.op <<" pc "<< pc << " i.imm.rs " << i.imm.rs << " i.imm.imm " <<i.imm.imm << " i.reg.rs "<<i.reg.rs<<" i.reg.rt "<<i.reg.rt<<" i.reg.rd "<<i.reg.rd<< " i.imm.rt " << i.imm.rt<<endl;
   switch (i.reg.op)
     {
     case 0:
@@ -179,7 +179,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
           break;
 
         case 9:			// jalr
-          cout<<"jalr\n";
+          //          //cout<<"jalr\n";
           _opControl = func_jalr;
           _btgt = _decodedSRC1;
           //          printf("jalr  %#x\n", _decodedSRC1) ;
@@ -192,7 +192,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
           _writeREG = FALSE;
           _writeFREG = FALSE;
           _btgt = _decodedSRC1;
-          //          cout << "jr" << endl;
+          //          //cout << "jr" << endl;
           //          exit(0);
           _bd = 1;
           break;
@@ -220,7 +220,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
 
     case 8:			// addi
     case 9:			// addiu
-      cout<<"addiu\n";
+      //      //cout<<"addiu\n";
       // ignore overflow: no exceptions
       _opControl = func_addi_addiu;
       _decodedSRC1 = _gpr[i.imm.rs];
@@ -231,8 +231,8 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
       _hiWPort = FALSE;
       _loWPort = FALSE;
       _memControl = FALSE;
-      //  cout<<"source reg in addiu "<<i.imm.rs<< " i.imm.imm " << i.imm.imm<<endl;
-      //      printf("ins %#x %#x %#x\n",ins, _decodedSRC1,_decodedSRC2);
+      //  //cout<<"source reg in addiu "<<i.imm.rs<< " i.imm.imm " << i.imm.imm<<endl;
+      //gprintf("ins %#x %#x %#x\n",ins, _decodedSRC1,_decodedSRC2);
       break;
 
     case 0xc:			// andi
@@ -245,7 +245,8 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
       _hiWPort = FALSE;
       _loWPort = FALSE;
       _memControl = FALSE;
-      //      printf("ins %#x %#x %#x\n",ins, _decodedSRC1,_decodedSRC2);
+      //cout <<"gpr "<<i.imm.rs<<endl;
+      //printf("ins %#x %#x %#x\n",ins, _decodedSRC1,_decodedSRC2);
       break;
 
     case 0xf:			// lui
@@ -270,7 +271,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
       _hiWPort = FALSE;
       _loWPort = FALSE;
       _memControl = FALSE;
-      //  cout <<"dest reg value in ori "<<i.imm.rt<<endl;
+      //  //cout <<"dest reg value in ori "<<i.imm.rt<<endl;
       //      printf("ins %#x %#x %#x\n",ins,,_decodedSRC2);
       break;
 
@@ -328,7 +329,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
       _branchOffset >>= 14;
       _bd = 1;
       _btgt = (unsigned)((signed)pc+_branchOffset+4);
-      //      cout << "beq" << endl;
+      //      //cout << "beq" << endl;
       //      printf("ins %#x %#x %#x\n",ins, _decodedSRC1,_decodedSRC2);
       //      exit(0);
       break;
@@ -352,7 +353,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
           _branchOffset >>= 14;
           _bd = 1;
           _btgt = (unsigned)((signed)pc+_branchOffset+4);
-          //          cout << "bgez" << endl;
+          //          //cout << "bgez" << endl;
           //          exit(0);
           break;
 
@@ -364,7 +365,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
           _branchOffset >>= 14;
           _bd = 1;
           _btgt = (unsigned)((signed)pc+_branchOffset+4);
-          //          cout << "bgezal" << endl;
+          //          //cout << "bgezal" << endl;
           //          exit(0);
           break;
 
@@ -376,7 +377,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
           _branchOffset >>= 14;
           _bd = 1;
           _btgt = (unsigned)((signed)pc+_branchOffset+4);
-          //          cout << "bltzal" << endl;
+          //          //cout << "bltzal" << endl;
           //          exit(0);
           break;
 
@@ -386,7 +387,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
           _branchOffset >>= 14;
           _bd = 1;
           _btgt = (unsigned)((signed)pc+_branchOffset+4);
-          //          cout << "bltz" << endl;
+          //          //cout << "bltz" << endl;
           //          exit(0);
           break;
 
@@ -409,7 +410,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
       _branchOffset >>= 14;
       _bd = 1;
       _btgt = (unsigned)((signed)pc+_branchOffset+4);
-      //      cout << "bgtz" << endl;
+      //      //cout << "bgtz" << endl;
       //            printf("ins %#x %#x %#x\n",ins, _decodedSRC1,_decodedSRC2);
       //      exit(0);
       break;
@@ -427,7 +428,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
       _branchOffset >>= 14;
       _bd = 1;
       _btgt = (unsigned)((signed)pc+_branchOffset+4);
-      //      cout << "blez" << endl;
+      //      //cout << "blez" << endl;
       //            printf("ins %#x %#x %#x\n",ins, _decodedSRC1,_decodedSRC2);
       //      exit(0);
       break;
@@ -446,7 +447,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
       _branchOffset >>= 14;
       _bd = 1;
       _btgt = (unsigned)((signed)pc+_branchOffset+4);
-      //      cout << "bne" << endl;
+      //      //cout << "bne" << endl;
       //      printf("ins %#x %#x %#x\n",ins, _decodedSRC1,_decodedSRC2);
       //      exit(0);
       break;
@@ -460,7 +461,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
       _loWPort = FALSE;
       _memControl = FALSE;
       _btgt = ((pc+4) & 0xf0000000) | (_branchOffset<<2);
-      //      cout << "j" << endl;
+      //      //cout << "j" << endl;
       //      exit(0);
       _bd = 1;
       break;
@@ -475,7 +476,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
       _loWPort = FALSE;
       _memControl = FALSE;
       _btgt = ((pc+4) & 0xf0000000) | (_branchOffset<<2);
-      //      cout << "jal" << endl;
+      //      //cout << "jal" << endl;
       //      exit(0);
       _bd = 1;
       break;
@@ -505,7 +506,7 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
       _hiWPort = FALSE;
       _loWPort = FALSE;
       _memControl = TRUE;
-      //            printf("ins %#x %#x %#x\n",ins, _decodedSRC1,_decodedSRC2);
+      //printf("ins %#x %#x %#x\n",ins, _decodedSRC1,_decodedSRC2);
       break;
 
     case 0x21:			// lh
@@ -728,13 +729,14 @@ Mipc::Dec (unsigned int pc, unsigned int ins, unsigned int _bd)
 
   //  printf("%#x %#x %#x %#x \n",ins,_decodedSRC1,_decodedSRC2,_gpr[_decodedDST]);
   ID_EX_bd = _bd;
+  //  cout<<"_bd "<<_bd<<endl;
   ID_EX_isSyscall = _isSyscall;
   ID_EX_isIllegalOp = _isIllegalOp;
   ID_EX_decodedSRC1 = _decodedSRC1;
   ID_EX_decodedSRC2 = _decodedSRC2;
   ID_EX_decodedDST = _decodedDST;
   ID_EX_writeREG = _writeREG;
-  ID_EX_writeFREG = _writeREG;
+  ID_EX_writeFREG = _writeFREG;
   ID_EX_hiWPort = _hiWPort;
   ID_EX_loWPort = _loWPort;
   ID_EX_memControl = _memControl;
@@ -758,7 +760,7 @@ Mipc::dumpregs (unsigned int _pc)
 {
   int i;
 
-  printf ("\n--- PC = %08x ---\n", _pc);
+  printf ("\n--- PC = %#x ---\n", _pc);
   for (i=0; i < 32; i++) {
     if (i < 10)
       printf (" r%d: %#x (%ld)\n", i, _gpr[i], _gpr[i]);
@@ -772,7 +774,7 @@ Mipc::dumpregs (unsigned int _pc)
 void
 Mipc::func_add_addu (Mipc *mc, unsigned ins)
 {
-  cout << "inside add_addu\n";
+  //cout << "add_addu\n";
   unsigned _opResultLo;
   _opResultLo = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -784,7 +786,7 @@ Mipc::func_add_addu (Mipc *mc, unsigned ins)
 void
 Mipc::func_and (Mipc *mc, unsigned ins)
 {
-  cout << "inside and\n";
+  //cout << "and\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC1 & mc->ID_EX_decodedSRC2;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -793,7 +795,7 @@ Mipc::func_and (Mipc *mc, unsigned ins)
 void
 Mipc::func_nor (Mipc *mc, unsigned ins)
 {
-  cout <<"nor\n";
+  //cout <<"nor\n";
   unsigned _opResultLo;
   _opResultLo = ~(mc->ID_EX_decodedSRC1 | mc->ID_EX_decodedSRC2);
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -802,7 +804,7 @@ Mipc::func_nor (Mipc *mc, unsigned ins)
 void
 Mipc::func_or (Mipc *mc, unsigned ins)
 {
-  cout<<"or\n";
+  //cout<<"or\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC1 | mc->ID_EX_decodedSRC2;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -811,7 +813,7 @@ Mipc::func_or (Mipc *mc, unsigned ins)
 void
 Mipc::func_sll (Mipc *mc, unsigned ins)
 {
-  cout<<"sll\n";
+  //cout<<"sll\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC2 << mc->ID_EX_decodedShiftAmt;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -820,7 +822,7 @@ Mipc::func_sll (Mipc *mc, unsigned ins)
 void
 Mipc::func_sllv (Mipc *mc, unsigned ins)
 {
-  cout<<"sllv\n";
+  //cout<<"sllv\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC2 << (mc->ID_EX_decodedSRC1 & 0x1f);
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -832,7 +834,7 @@ Mipc::func_sllv (Mipc *mc, unsigned ins)
 void
 Mipc::func_slt (Mipc *mc, unsigned ins)
 {
-  cout<<"slt\n";
+  //cout<<"slt\n";
   unsigned _opResultLo;
   if (mc->ID_EX_decodedSRC1 < mc->ID_EX_decodedSRC2) {
     _opResultLo = 1;
@@ -846,7 +848,7 @@ Mipc::func_slt (Mipc *mc, unsigned ins)
 void
 Mipc::func_sltu (Mipc *mc, unsigned ins)
 {
-  cout <<"sltu\n";
+  //cout <<"sltu\n";
   unsigned _opResultLo;
   if ((unsigned)mc->ID_EX_decodedSRC1 < (unsigned)mc->ID_EX_decodedSRC2) {
     _opResultLo = 1;
@@ -860,7 +862,7 @@ Mipc::func_sltu (Mipc *mc, unsigned ins)
 void
 Mipc::func_sra (Mipc *mc, unsigned ins)
 {
-  cout<<"sra\n";
+  //cout<<"sra\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC2 >> mc->ID_EX_decodedShiftAmt;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -869,7 +871,7 @@ Mipc::func_sra (Mipc *mc, unsigned ins)
 void
 Mipc::func_srav (Mipc *mc, unsigned ins)
 {
-  cout<<"srav\n";
+  //cout<<"srav\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC2 >> (mc->ID_EX_decodedSRC1 & 0x1f);
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -878,7 +880,7 @@ Mipc::func_srav (Mipc *mc, unsigned ins)
 void
 Mipc::func_srl (Mipc *mc, unsigned ins)
 {
-  cout<<"srl\n";
+  //cout<<"srl\n";
   unsigned _opResultLo;
   _opResultLo = (unsigned)mc->ID_EX_decodedSRC2 >> mc->ID_EX_decodedShiftAmt;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -887,7 +889,7 @@ Mipc::func_srl (Mipc *mc, unsigned ins)
 void
 Mipc::func_srlv (Mipc *mc, unsigned ins)
 {
-  cout<<"srlv\n";
+  //cout<<"srlv\n";
   unsigned _opResultLo;
   _opResultLo = (unsigned)mc->ID_EX_decodedSRC2 >> (mc->ID_EX_decodedSRC1 & 0x1f);
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -896,7 +898,7 @@ Mipc::func_srlv (Mipc *mc, unsigned ins)
 void
 Mipc::func_sub_subu (Mipc *mc, unsigned ins)
 {
-  cout << "inside sub_subu\n";
+  //cout << "sub_subu\n";
   unsigned _opResultLo;
   _opResultLo = (unsigned)mc->ID_EX_decodedSRC1 - (unsigned)mc->ID_EX_decodedSRC2;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -905,7 +907,7 @@ Mipc::func_sub_subu (Mipc *mc, unsigned ins)
 void
 Mipc::func_xor (Mipc *mc, unsigned ins)
 {
-  cout << "inside xor\n";
+  //cout << "xor\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC1 ^ mc->ID_EX_decodedSRC2;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -914,7 +916,7 @@ Mipc::func_xor (Mipc *mc, unsigned ins)
 void
 Mipc::func_div (Mipc *mc, unsigned ins)
 {
-  cout<<"div\n";
+  //cout<<"div\n";
   unsigned _opResultLo, _opResultHi;
   if (mc->ID_EX_decodedSRC2 != 0) {
     _opResultHi = (unsigned)(mc->ID_EX_decodedSRC1 % mc->ID_EX_decodedSRC2);
@@ -931,7 +933,7 @@ Mipc::func_div (Mipc *mc, unsigned ins)
 void
 Mipc::func_divu (Mipc *mc, unsigned ins)
 {
-  cout<<"divu\n";
+  //cout<<"divu\n";
   unsigned _opResultHi, _opResultLo;
   if ((unsigned)mc->ID_EX_decodedSRC2 != 0) {
     _opResultHi = (unsigned)(mc->ID_EX_decodedSRC1) % (unsigned)(mc->ID_EX_decodedSRC2);
@@ -948,21 +950,21 @@ Mipc::func_divu (Mipc *mc, unsigned ins)
 void
 Mipc::func_mfhi (Mipc *mc, unsigned ins)
 {
-  cout<<"mfhi\n";
+  //cout<<"mfhi\n";
   mc->EX_MEM_contents.opResultLo = mc->ID_EX_hi;
 }
 
 void
 Mipc::func_mflo (Mipc *mc, unsigned ins)
 {
-  cout<<"mflo\n";
+  //cout<<"mflo\n";
   mc->EX_MEM_contents.opResultLo = mc->ID_EX_lo;
 }
 
 void
 Mipc::func_mthi (Mipc *mc, unsigned ins)
 {
-  cout<<"mthi\n";
+  //cout<<"mthi\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC1;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -971,7 +973,7 @@ Mipc::func_mthi (Mipc *mc, unsigned ins)
 void
 Mipc::func_mtlo (Mipc *mc, unsigned ins)
 {
-  cout<<"mtlo\n";
+  //cout<<"mtlo\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC2;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -980,7 +982,7 @@ Mipc::func_mtlo (Mipc *mc, unsigned ins)
 void
 Mipc::func_mult (Mipc *mc, unsigned ins)
 {
-  cout<<"mult\n";
+  //cout<<"mult\n";
   unsigned int ar1, ar2, s1, s2, r1, r2, t1, t2;
 
   ar1 = mc->ID_EX_decodedSRC1;
@@ -1016,7 +1018,7 @@ Mipc::func_mult (Mipc *mc, unsigned ins)
 void
 Mipc::func_multu (Mipc *mc, unsigned ins)
 {
-  cout<<"multu\n";
+  //cout<<"multu\n";
   unsigned int ar1, ar2, s1, s2, r1, r2, t1, t2;
                                                                                 
   ar1 = mc->ID_EX_decodedSRC1;
@@ -1042,7 +1044,7 @@ Mipc::func_multu (Mipc *mc, unsigned ins)
 void
 Mipc::func_jalr (Mipc *mc, unsigned ins)
 {
-  cout<<"jalr\n";
+  //cout<<"jalr\n";
   //  mc->ID_EX_BRANCH = 1;
   int _btaken;
   unsigned _opResultLo;
@@ -1056,7 +1058,7 @@ Mipc::func_jalr (Mipc *mc, unsigned ins)
 void
 Mipc::func_jr (Mipc *mc, unsigned ins)
 {
-  cout<<"jr\n";
+  //cout<<"jr\n";
   //mc->ID_EX_BRANCH = 1;
   int _btaken;
   _btaken = 1;
@@ -1066,20 +1068,20 @@ Mipc::func_jr (Mipc *mc, unsigned ins)
 
 void
 Mipc::func_await_break (Mipc *mc, unsigned ins)
-{cout<<"await_break\n";
+{//cout<<"await_break\n";
 }
 
 void
 Mipc::func_syscall (Mipc *mc, unsigned ins)
 {
-  cout<<"syscall\n";
+  //cout<<"syscall\n";
   mc->fake_syscall (ins,mc->ID_EX_pc);
 }
 
 void
 Mipc::func_addi_addiu (Mipc *mc, unsigned ins)
 {
-  cout<<"addi_addiu\n";
+  //cout<<"addi_addiu\n";
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _opResultLo;
   _opResultLo = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
@@ -1093,7 +1095,7 @@ Mipc::func_addi_addiu (Mipc *mc, unsigned ins)
 void
 Mipc::func_andi (Mipc *mc, unsigned ins)
 {
-  cout<<"andi\n";
+  //cout<<"andi\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC1 & mc->ID_EX_decodedSRC2;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -1102,7 +1104,7 @@ Mipc::func_andi (Mipc *mc, unsigned ins)
 void
 Mipc::func_lui (Mipc *mc, unsigned ins)
 {
-  cout<<"lui\n";
+  //cout<<"lui\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC2 << 16;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -1114,7 +1116,7 @@ Mipc::func_lui (Mipc *mc, unsigned ins)
 void
 Mipc::func_ori (Mipc *mc, unsigned ins)
 {
-  cout<<"ori\n";
+  //cout<<"ori\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC1 | mc->ID_EX_decodedSRC2;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -1126,7 +1128,7 @@ Mipc::func_ori (Mipc *mc, unsigned ins)
 void
 Mipc::func_slti (Mipc *mc, unsigned ins)
 {
-  cout<<"slti\n";
+  //cout<<"slti\n";
   unsigned _opResultLo;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   if (mc->ID_EX_decodedSRC1 < mc->ID_EX_decodedSRC2) {
@@ -1141,7 +1143,7 @@ Mipc::func_slti (Mipc *mc, unsigned ins)
 void
 Mipc::func_sltiu (Mipc *mc, unsigned ins)
 {
-  cout<<"sltiu\n";
+  //cout<<"sltiu\n";
   unsigned _opResultLo;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   if ((unsigned)mc->ID_EX_decodedSRC1 < (unsigned)mc->ID_EX_decodedSRC2) {
@@ -1156,7 +1158,7 @@ Mipc::func_sltiu (Mipc *mc, unsigned ins)
 void
 Mipc::func_xori (Mipc *mc, unsigned ins)
 {
-  cout<<"xori\n";
+  //cout<<"xori\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC1 ^ mc->ID_EX_decodedSRC2;
     mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -1165,7 +1167,7 @@ Mipc::func_xori (Mipc *mc, unsigned ins)
 void
 Mipc::func_beq (Mipc *mc, unsigned ins)
 {
-  cout<<"beq\n";
+  //cout<<"beq\n";
   //    mc->ID_EX_BRANCH = 1;
   int _btaken;
   mc->_num_cond_br++;
@@ -1179,7 +1181,7 @@ Mipc::func_beq (Mipc *mc, unsigned ins)
 void
 Mipc::func_bgez (Mipc *mc, unsigned ins)
 {
-  cout<<"bgez\n";
+  //cout<<"bgez\n";
   //    mc->ID_EX_BRANCH = 1;
   int _btaken;
   mc->_num_cond_br++;
@@ -1190,7 +1192,7 @@ Mipc::func_bgez (Mipc *mc, unsigned ins)
 void
 Mipc::func_bgezal (Mipc *mc, unsigned ins)
 {
-  cout<<"bgezal\n";
+  //cout<<"bgezal\n";
   //    mc->ID_EX_BRANCH = 1;
   int _btaken;
   unsigned _opResultLo;
@@ -1204,7 +1206,7 @@ Mipc::func_bgezal (Mipc *mc, unsigned ins)
 void
 Mipc::func_bltzal (Mipc *mc, unsigned ins)
 {
-  cout<<"bltzal\n";
+  //cout<<"bltzal\n";
   //mc->ID_EX_BRANCH = 1;
   int _btaken;
   unsigned _opResultLo;
@@ -1218,7 +1220,7 @@ Mipc::func_bltzal (Mipc *mc, unsigned ins)
 void
 Mipc::func_bltz (Mipc *mc, unsigned ins)
 {
-  cout<<"bltz\n";
+  //cout<<"bltz\n";
   //mc->ID_EX_BRANCH = 1;
   int _btaken;
   mc->_num_cond_br++;
@@ -1229,7 +1231,7 @@ Mipc::func_bltz (Mipc *mc, unsigned ins)
 void
 Mipc::func_bgtz (Mipc *mc, unsigned ins)
 {
-  cout<<"bgtz\n";
+  //cout<<"bgtz\n";
   //mc->ID_EX_BRANCH = 1;
   int _btaken;
   mc->_num_cond_br++;
@@ -1240,7 +1242,7 @@ Mipc::func_bgtz (Mipc *mc, unsigned ins)
 void
 Mipc::func_blez (Mipc *mc, unsigned ins)
 {
-  cout<<"blez\n";
+  //cout<<"blez\n";
   //mc->ID_EX_BRANCH = 1;
   int _btaken;
   mc->_num_cond_br++;
@@ -1251,8 +1253,8 @@ Mipc::func_blez (Mipc *mc, unsigned ins)
 void
 Mipc::func_bne (Mipc *mc, unsigned ins)
 {
-  cout<<"bne\n";
-  //mc->ID_EX_BRANCH = 1;
+  //cout<<"bne\n";
+  //printf("mc->ID_EX_decodedSRC1 %#x mc->ID_EX_decodedSRC2 %#x\n",mc->ID_EX_decodedSRC1,mc->ID_EX_decodedSRC2);
   int _btaken;
   mc->_num_cond_br++;
   _btaken = (mc->ID_EX_decodedSRC1 != mc->ID_EX_decodedSRC2);
@@ -1262,7 +1264,7 @@ Mipc::func_bne (Mipc *mc, unsigned ins)
 void
 Mipc::func_j (Mipc *mc, unsigned ins)
 {
-  cout<<"j\n";
+  //cout<<"j\n";
   //mc->ID_EX_BRANCH = 1;
   int _btaken;
   _btaken = 1;
@@ -1272,7 +1274,7 @@ Mipc::func_j (Mipc *mc, unsigned ins)
 void
 Mipc::func_jal (Mipc *mc, unsigned ins)
 {
-  cout<<"jal\n";
+  //cout<<"jal\n";
   //mc->ID_EX_BRANCH = 1;
   int _btaken;
   unsigned _opResultLo;
@@ -1290,59 +1292,59 @@ Mipc::func_jal (Mipc *mc, unsigned ins)
 void
 Mipc::func_lb (Mipc *mc, unsigned ins)
 {
-  cout<<"lb\n";
+  //cout<<"lb\n";
   signed int a1;
 
   mc->_num_load++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_lbu (Mipc *mc, unsigned ins)
 {
-  cout<<"lbu\n";
+  //cout<<"lbu\n";
   mc->_num_load++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_lh (Mipc *mc, unsigned ins)
 {
-  cout<<"lh\n";
+  //cout<<"lh\n";
   signed int a1;
                                                                                 
   mc->_num_load++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_lhu (Mipc *mc, unsigned ins)
 {
-  cout<<"lhu\n";
+  //cout<<"lhu\n";
   mc->_num_load++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_lwl (Mipc *mc, unsigned ins)
 {
-  cout<<"lwl\n";
+  //cout<<"lwl\n";
   signed int a1;
   unsigned s1;
                                                                                 
@@ -1350,19 +1352,19 @@ Mipc::func_lwl (Mipc *mc, unsigned ins)
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_lw (Mipc *mc, unsigned ins)
 {
-  cout<<"lw\n";
+  //cout<<"lw\n";
   mc->_num_load++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
   /*   mc->_num_load++;
        printf("Encountered unimplemented instruction: lw.\n");
@@ -1373,109 +1375,110 @@ Mipc::func_lw (Mipc *mc, unsigned ins)
 void
 Mipc::func_lwr (Mipc *mc, unsigned ins)
 {
-  cout<<"lwr\n";
+  //cout<<"lwr\n";
   unsigned ar1, s1;
                                                                                 
   mc->_num_load++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_lwc1 (Mipc *mc, unsigned ins)
 {
-  cout<<"lwcl\n";
+  //cout<<"lwcl\n";
   mc->_num_load++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_swc1 (Mipc *mc, unsigned ins)
 {
-  cout<<"swcl\n";
+  //cout<<"swcl\n";
   mc->_num_store++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_sb (Mipc *mc, unsigned ins)
 {
-  cout<<"sb\n";
+  //cout<<"sb\n";
   mc->_num_store++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_sh (Mipc *mc, unsigned ins)
 {
-  cout<<"sh\n";
+  //cout<<"sh\n";
   mc->_num_store++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_swl (Mipc *mc, unsigned ins)
 {
-  cout<<"swl\n";
+  //cout<<"swl\n";
   unsigned ar1, s1;
                                                                                 
   mc->_num_store++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_sw (Mipc *mc, unsigned ins)
 {
-  cout<<"sw\n";
+  //cout<<"sw\n";
   mc->_num_store++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  printf("%#x\n",_MAR);
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_swr (Mipc *mc, unsigned ins)
 {
-  cout<<"swr\n";
+  //cout<<"swr\n";
   unsigned ar1, s1;
                                                                                 
   mc->_num_store++;
   SIGN_EXTEND_IMM(mc->ID_EX_decodedSRC2);
   unsigned _MAR;
   _MAR = (unsigned)(mc->ID_EX_decodedSRC1+mc->ID_EX_decodedSRC2);
-  mc->_MAR_MEM = mc->_MAR_EX;
+  //  mc->_MAR_MEM = mc->_MAR_EX;
   mc->_MAR_EX = _MAR;
 }
 
 void
 Mipc::func_mtc1 (Mipc *mc, unsigned ins)
 {
-  cout<<"mtcl\n";
+  //cout<<"mtcl\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC1;
   mc->EX_MEM_contents.opResultLo = _opResultLo;
@@ -1484,7 +1487,7 @@ Mipc::func_mtc1 (Mipc *mc, unsigned ins)
 void
 Mipc::func_mfc1 (Mipc *mc, unsigned ins)
 {
-  cout<<"mfcl\n";
+  //cout<<"mfcl\n";
   unsigned _opResultLo;
   _opResultLo = mc->ID_EX_decodedSRC1;
   mc->EX_MEM_contents.opResultLo = _opResultLo;

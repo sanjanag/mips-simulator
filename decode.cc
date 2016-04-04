@@ -41,7 +41,7 @@ Decode::MainLoop (void)
         {
           ins = _mc->IF_ID_ins;
           pc = _mc->IF_ID_pc;
-          bd = _mc->ID_EX_bd;
+          bd = _mc->IF_ID_bd;
           _mc->_RAW = 0;
         }
       else
@@ -82,12 +82,28 @@ Decode::MainLoop (void)
       else if(stallDECODE == 0)
         {
           if(ins != 0)
-            _mc->ID_EX_NOP = 0;
-          _mc->Dec(pc, ins, bd);
-#ifdef MIPC_DEBUG
-          fprintf(_mc->_debugLog, "<%llu>  Decoded ins %#x  BD %d TGT %#x \n", SIM_TIME,ins, _mc->ID_EX_bd,_mc->ID_EX_btgt);
-#endif
+            {
+              _mc->ID_EX_NOP = 0;
+            }
+          else
+            {
+              _mc->ID_EX_NOP = 1;
+              #ifdef MIPC_DEBUG
+              fprintf(_mc->_debugLog, "<%llu> ins = 0\n",SIM_TIME);
+              #endif
+            }
 
+          _mc->Dec(pc, ins, bd);
+          
+#ifdef MIPC_DEBUG
+          if(_mc->ID_EX_writeREG)
+            fprintf(_mc->_debugLog, "<%llu> Decoded ins %#x  BD %d TGT %#x decodedSRC1 %#x decodedSRC2 %#x decodedDST %u\n", SIM_TIME, ins, _mc->ID_EX_bd,_mc->ID_EX_btgt,_mc->ID_EX_decodedSRC1,_mc->ID_EX_decodedSRC2,_mc->ID_EX_decodedDST);
+          else if(_mc->ID_EX_writeFREG)
+            fprintf(_mc->_debugLog, "<%llu> Decoded ins %#x  BD %d TGT %#x decodedSRC1 %#x decodedSRC2 %#x decodedDST %u\n", SIM_TIME, ins, _mc->ID_EX_bd,_mc->ID_EX_btgt,_mc->ID_EX_decodedSRC1,_mc->ID_EX_decodedSRC2,_mc->ID_EX_decodedDST);
+          else
+            fprintf(_mc->_debugLog, "<%llu> Decoded ins %#x  BD %d TGT %#x decodedSRC1 %#x decodedSRC2 %#x decodedDST %u\n", SIM_TIME, ins, _mc->ID_EX_bd,_mc->ID_EX_btgt,_mc->ID_EX_decodedSRC1,_mc->ID_EX_decodedSRC2,_mc->ID_EX_decodedDST);
+#endif
+          
         }      
 
       //check if syscall
@@ -100,7 +116,7 @@ Decode::MainLoop (void)
           _mc->_DEC_pc = pc;
           _mc->_DEC_bd = bd;
 
-          _mc->_stallFETCH = 1;
+          _mc->_stallFETCH = 2;
           _mc->_stallDECODE = 2;
           _mc->_SYSCALL = 1;
 #ifdef MIPC_DEBUG
@@ -108,15 +124,20 @@ Decode::MainLoop (void)
 #endif
 
         }
-      /*#ifdef MIPC_DEBUG
-              fprintf(_mc->_debugLog,"<%llu> raw %d\n",SIM_TIME,_mc->_RAW);
-              #endif*/
-
+else{
       //check for RAW hazards
-      else if(_mc->ID_EX_NOP != 1 && ID_EX_NOP != 1)
+      if(_mc->ID_EX_NOP != 1 && ID_EX_NOP != 1)
         {
-          if(ID_EX_writeREG && (_mc->ID_EX_decodedSRC1 == _mc->_gpr[ID_EX_decodedDST] || _mc->ID_EX_decodedSRC2 == _mc->_gpr[ID_EX_decodedDST]))  
-            hazard = 1;
+#ifdef MIPC_DEBUG
+          fprintf(_mc->_debugLog,"<%llu> Checking RAW hazard for ins %#x ID_EX_writeREG %d ID_EX_writeFREG %d\n",SIM_TIME,ins,ID_EX_writeREG,ID_EX_writeFREG);
+#endif
+
+          if(ID_EX_writeREG && (_mc->ID_EX_decodedSRC1 == _mc->_gpr[ID_EX_decodedDST] || _mc->ID_EX_decodedSRC2 == _mc->_gpr[ID_EX_decodedDST]))
+            {
+
+              
+              hazard = 1;
+            }
           else if(ID_EX_writeFREG && (_mc->ID_EX_decodedSRC1 == _mc->_fpr[(ID_EX_decodedDST)>>1].l[FP_TWIDDLE^((ID_EX_decodedDST)&1)] || _mc->ID_EX_decodedSRC2 == _mc->_fpr[(ID_EX_decodedDST)>>1].l[FP_TWIDDLE^((ID_EX_decodedDST)&1)]))
             hazard = 1;
           else
@@ -126,7 +147,7 @@ Decode::MainLoop (void)
             {
               _mc->_RAW = 1;
 #ifdef MIPC_DEBUG
-              fprintf(_mc->_debugLog, "<%llu> Decoded ins %#x has a RAW\n", SIM_TIME,ins);
+              fprintf(_mc->_debugLog, "<%llu> Decoded ins %#x has a RAW with prev to prev ins\n", SIM_TIME,ins);
 #endif
           
               _mc->_DEC_ins = ins;
@@ -145,39 +166,26 @@ Decode::MainLoop (void)
             }
             
         }
-      else if(_mc->ID_EX_NOP != 1 &&  EX_MEM_NOP != 1)
+      if(_mc->ID_EX_NOP != 1 &&  EX_MEM_NOP != 1 && hazard==0)
         {
-          if(EX_MEM_writeREG) 
-            {
-              if(_mc->ID_EX_decodedSRC1 == _mc->_gpr[EX_MEM_decodedDST] || _mc->ID_EX_decodedSRC2 == _mc->_gpr[EX_MEM_decodedDST])
-                //      _mc->_RAW = 1;
-                
+#ifdef MIPC_DEBUG
+          fprintf(_mc->_debugLog,"<%llu> Checking RAW hazard for ins %#x EX_MEM\n",SIM_TIME,ins);
+#endif
+
+          if(EX_MEM_writeREG && (_mc->ID_EX_decodedSRC1 == _mc->_gpr[EX_MEM_decodedDST] || _mc->ID_EX_decodedSRC2 == _mc->_gpr[EX_MEM_decodedDST])) 
+            hazard =1;
+            
+          else if(EX_MEM_writeFREG && (_mc->ID_EX_decodedSRC1 == _mc->_fpr[(EX_MEM_decodedDST)>>1].l[FP_TWIDDLE^((EX_MEM_decodedDST)&1)] || _mc->ID_EX_decodedSRC2 == _mc->_fpr[(EX_MEM_decodedDST)>>1].l[FP_TWIDDLE^((EX_MEM_decodedDST)&1)]))
                 hazard =1;
-              else
-                //                _mc->_RAW = 0;
-                hazard = 0;
- 
-            }
-          else if(EX_MEM_writeFREG)
-            {
-              if(_mc->ID_EX_decodedSRC1 == _mc->_fpr[(EX_MEM_decodedDST)>>1].l[FP_TWIDDLE^((EX_MEM_decodedDST)&1)] || _mc->ID_EX_decodedSRC2 == _mc->_fpr[(EX_MEM_decodedDST)>>1].l[FP_TWIDDLE^((EX_MEM_decodedDST)&1)])
-                //                _mc->_RAW = 1;
-                hazard =1;
-              else
-                //                _mc->_RAW = 0;
-                hazard = 0;
- 
-            }
+            
           else
-            {
-      //              _mc->_RAW = 0;
-      hazard = 0;
-            }
+            hazard = 0;
+            
           if(hazard == 1)
             {
 
 #ifdef MIPC_DEBUG
-              fprintf(_mc->_debugLog, "<%llu> Decoded ins %#x has a RAW\n", SIM_TIME,ins);
+              fprintf(_mc->_debugLog, "<%llu> Decoded ins %#x has a RAW with prev\n", SIM_TIME,ins);
 #endif
               _mc->_RAW = 1;    
               _mc->_DEC_ins = ins;
@@ -189,7 +197,7 @@ Decode::MainLoop (void)
 #ifdef MIPC_DEBUG
               fprintf(_mc->_debugLog, "<%llu> Nullifying ins %#x by decoding ins %#x \n", SIM_TIME,_mc->_DEC_ins,ins);
 #endif          
-              _mc->_stallFETCH = 2;
+              _mc->_stallFETCH = 1;
 
 #ifdef MIPC_DEBUG
               fprintf(_mc->_debugLog, "<%llu> stalling _stallFETCH %d _RAW %d  \n", SIM_TIME,_mc->_stallFETCH, _mc->_RAW);
@@ -198,6 +206,7 @@ Decode::MainLoop (void)
             
           
         }
+ }
 
       _mc->ID_EX_pc = pc; // for jalr
       _mc->ID_EX_ins = ins;

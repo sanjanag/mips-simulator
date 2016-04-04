@@ -53,10 +53,6 @@ Memory::MainLoop (void)
       hiWPort = _mc->EX_MEM_hiWPort;
       loWPort = _mc->EX_MEM_loWPort;
       opResultLo = _mc->EX_MEM_opResultLo;
-      /*#ifdef MIPC_DEBUG
-          fprintf(_mc->_debugLog, "<%llu> Contents of opresultlo in memory at pc %#x opresultlo  %#x\n", SIM_TIME, pc, opResultLo);
-          #endif*/
-
       opResultHi = _mc->EX_MEM_opResultHi;
       btaken = _mc->EX_MEM_btaken;
       hi = _mc->EX_MEM_hi;
@@ -65,7 +61,8 @@ Memory::MainLoop (void)
       _mc->tempdecodedDST = _mc->EX_MEM_decodedDST;
       NOP = _mc->EX_MEM_NOP;
       BRANCH = _mc->EX_MEM_BRANCH;
-
+      _mc->_MAR_MEM = _mc->EX_MEM_MAR;
+      
       AWAIT_P_PHI1;       // @negedge
 
       if (memControl)
@@ -80,6 +77,8 @@ Memory::MainLoop (void)
 #ifdef MIPC_DEBUG
           fprintf(_mc->_debugLog, "<%llu> Memory has nothing to do for ins %#x\n", SIM_TIME, ins);
 #endif
+          
+      _mc->MEM_WB_opResultLo = opResultLo;
         }
 
       //update registers
@@ -103,7 +102,6 @@ Memory::MainLoop (void)
       _mc->MEM_WB_hiWPort = hiWPort;
       _mc->MEM_WB_loWPort = loWPort;
       _mc->MEM_WB_opResultHi = opResultHi;
-      _mc->MEM_WB_opResultLo = opResultLo;
       _mc->MEM_WB_btaken = btaken;
       _mc->MEM_WB_hi = hi;
       _mc->MEM_WB_lo = lo;

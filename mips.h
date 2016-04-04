@@ -51,6 +51,7 @@ public:
    unsigned tempdecodedDST;
 	temp_contents* contents ;
 
+  
    unsigned int _npc;
    unsigned _MAR_EX; //to store the destination for load store in EX
    unsigned _MAR_MEM; //to update the destination with load/store value
@@ -106,6 +107,7 @@ public:
    unsigned int EX_MEM_hi, EX_MEM_lo;
    int EX_MEM_NOP;
    int EX_MEM_BRANCH;
+   unsigned EX_MEM_MAR;
    
    //Pipeline registers MEM/WB
    unsigned int MEM_WB_pc;
@@ -137,7 +139,8 @@ public:
    void dumpregs (unsigned int _pc);	// Dumps current register state
 
    void Reboot (char *image = NULL);
-				// Restart processor.
+
+   // Restart processor.
 				// "image" = file name for new memory
 				// image if any.
 

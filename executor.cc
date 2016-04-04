@@ -61,7 +61,7 @@ Exe::MainLoop (void)
           opControl(_mc,ins);
       
 #ifdef MIPC_DEBUG
-          fprintf(_mc->_debugLog, "<%llu> Executed ins %#x opresultlo %#x\n", SIM_TIME, ins,_mc->EX_MEM_contents.opResultLo);
+          fprintf(_mc->_debugLog, "<%llu> Executed ins %#x opresultlo  %#x btgt %#x _MAR %#x\n", SIM_TIME, ins,_mc->EX_MEM_contents.opResultLo,btgt,_mc->_MAR_EX);
 #endif
         }
       else if (isSyscall)
@@ -81,9 +81,14 @@ Exe::MainLoop (void)
         {
           if ( _mc->EX_MEM_contents.btaken)
             {
+
+              
               _mc->_npc = btgt;
 
               _mc->_BTAKEN = 1;
+#ifdef MIPC_DEBUG
+              fprintf(_mc->_debugLog, "<%llu> BTAKEN ins %#x in execution stage at PC %#x _npc %#x\n", SIM_TIME, ins, pc,_mc->_npc);
+#endif
             }
         }
         
@@ -120,6 +125,7 @@ Exe::MainLoop (void)
       _mc->EX_MEM_contents.btaken = 0;
       _mc->EX_MEM_NOP = NOP;
       _mc->EX_MEM_BRANCH = BRANCH;
+      _mc->EX_MEM_MAR = _mc->_MAR_EX;
       //FETCH
       
     }

@@ -48,8 +48,12 @@ Mipc::MainLoop (void)
       if(stallFETCH == 0)
         {
           if(_BTAKEN==1)
-            {  
+            {
+#ifdef MIPC_DEBUG
+              fprintf(_debugLog,"<%llu> BTAKEN in fetch\n",SIM_TIME);
+#endif
               addr = _npc;
+              pc = addr;
               _BTAKEN = 0;
             }
           
@@ -164,7 +168,7 @@ Mipc::Reboot (char *image)
                 _sim_exit = 0;
                 _pc = ParamGetInt ("Mipc.BootPC");	// Boom! GO
                 /*----------------------------------*/
-    cout << "Resetting states" << endl;
+    //    cout << "Resetting states" << endl;
     for(int i=0;i<32;i++)
       _gpr[i] = 0;
     _npc = ParamGetInt ("Mipc.BootPC");	// Boom! GO
@@ -250,6 +254,7 @@ Mipc::Reboot (char *image)
     EX_MEM_opResultHi = 0; EX_MEM_opResultLo = 0;
     EX_MEM_btaken = 0;
     EX_MEM_hi = 0; EX_MEM_lo = 0;
+    EX_MEM_MAR = 0;
    
     //Pipeline registers MEM/WB
     MEM_WB_pc = 0;
@@ -272,7 +277,7 @@ Mipc::Reboot (char *image)
     MEM_WB_btaken = 0;
     MEM_WB_hi = 0; MEM_WB_lo = 0;
 
-    cout << "Reset done" << endl;
+    //    cout << "Reset done" << endl;
   }
 }
 
